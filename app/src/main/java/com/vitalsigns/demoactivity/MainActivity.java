@@ -2,6 +2,7 @@ package com.vitalsigns.demoactivity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -50,33 +51,36 @@ public class MainActivity extends AppCompatActivity
     /// [AT-PM] : Create Scan BLE tab ; 08/14/2017
     mTvScanBle = new TextView(this);
     mTvScanBle.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                             ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                             ViewGroup.LayoutParams.MATCH_PARENT,
                                                              1.0f));
     mTvScanBle.setText(R.string.bottombar_ble_scan);
     mTvScanBle.setTextColor(getResources().getColor(R.color.colorWhite));
-    mTvScanBle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+    mTvScanBle.setGravity(Gravity.CENTER);
+    mTvScanBle.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
     mTvScanBle.setOnClickListener(mBottombarSelect);
     bottombar.addView(mTvScanBle);
 
     /// [AT-PM] : Create Pedomter tab ; 08/14/2017
     mTvPedometer = new TextView(this);
     mTvPedometer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                               ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                               ViewGroup.LayoutParams.MATCH_PARENT,
                                                                1.0f));
     mTvPedometer.setText(R.string.bottombar_pedometer);
     mTvPedometer.setTextColor(getResources().getColor(R.color.colorWhite));
-    mTvPedometer.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+    mTvPedometer.setGravity(Gravity.CENTER);
+    mTvPedometer.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
     mTvPedometer.setOnClickListener(mBottombarSelect);
     bottombar.addView(mTvPedometer);
 
     /// [AT-PM] : Create Sleep Monitor tab ; 08/14/2017
     mTvSleepMonitor = new TextView(this);
     mTvSleepMonitor.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                                  ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                                  ViewGroup.LayoutParams.MATCH_PARENT,
                                                                   1.0f));
     mTvSleepMonitor.setText(R.string.bottombar_sleep_monitor);
     mTvSleepMonitor.setTextColor(getResources().getColor(R.color.colorWhite));
-    mTvSleepMonitor.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+    mTvSleepMonitor.setGravity(Gravity.CENTER);
+    mTvSleepMonitor.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
     mTvSleepMonitor.setOnClickListener(mBottombarSelect);
     bottombar.addView(mTvSleepMonitor);
   }
