@@ -1,24 +1,44 @@
 package com.vitalsigns.demoactivity;
 
+import android.bluetooth.BluetoothDevice;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.vitalsigns.demoactivity.ble.DemoBle;
+import com.vitalsigns.demoactivity.fragment.ScanBleFragment;
+import com.vitalsigns.sdk.ble.scan.DeviceListFragment;
 
 public class MainActivity extends AppCompatActivity
+  implements DeviceListFragment.OnEvent
 {
+  private static final String LOG_TAG = "MainActivity:";
   private TextView mTvScanBle;
   private TextView mTvPedometer;
   private TextView mTvSleepMonitor;
+  private DemoBle mDemoBle;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    /// [CC] : Permission request ; 08/21/2017
+    Utility.RequestPermissionAccessCoarseLocation(this,
+                                                  getString(R.string.request_permission_coarse_location_title),
+                                                  getString(R.string.request_permission_coarse_location_content),
+                                                  null);
+
+    Utility.RequestPermissionAccessExternalStorage(this,
+                                                   getString(R.string.request_permission_access_storage_title),
+                                                   getString(R.string.request_permission_access_storage_content),
+                                                   null);
   }
 
   @Override
@@ -27,6 +47,9 @@ public class MainActivity extends AppCompatActivity
     super.onStart();
 
     setBottombar();
+
+    /// [CC] : Ble module initial ; 08/21/2017
+    bleInit();
 
     /// [AT-PM] : Set initial tab ; 08/14/2017
     mTvScanBle.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -39,6 +62,8 @@ public class MainActivity extends AppCompatActivity
     super.onStop();
 
     removeBottombar();
+
+    bleUnInit();
   }
 
   /**
@@ -135,15 +160,50 @@ public class MainActivity extends AppCompatActivity
   };
 
   /**
+   * @brief showScanBle
+   *
    * Show Scan BLE fragment
+   *
+   * @return NULL
    */
   private void showScanBle()
   {
+    ScanBleFragment fragment;
+    fragment = new ScanBleFragment();
 
+    fragment.SetCallback(scanBleFragmentListener);
+    getFragmentManager().beginTransaction().replace(R.id.fragment_container_layout,
+                                                    fragment,
+                                                    getString(R.string.fragment_tag_scan_ble))
+                                           .commitAllowingStateLoss();
   }
 
+  private ScanBleFragment.OnScanBleFragmentListener scanBleFragmentListener = new ScanBleFragment.OnScanBleFragmentListener()
+  {
+    @Override
+    public void onScanBleDevice()
+    {
+      if((mDemoBle != null) && (mDemoBle.isConnect()))
+      {
+        mDemoBle.disconnect();
+        return;
+      }
+
+      /// [CC] : Scan device ; 08/21/2017
+      DeviceListFragment fragment = DeviceListFragment.newInstance(DeviceListFragment.ACTION_SCAN_BLE_DEVICE,
+        DeviceListFragment.STYLE_WHITE);
+      getFragmentManager().beginTransaction()
+        .add(fragment, getResources().getString(R.string.device_list_fragment_tag))
+        .commitAllowingStateLoss();
+    }
+  };
+
   /**
-   * Show Pedomter fragment
+   * @brief showScanBle
+   *
+   * Show Pedometer fragment
+   *
+   * @return NULL
    */
   private void showPedometer()
   {
@@ -151,10 +211,122 @@ public class MainActivity extends AppCompatActivity
   }
 
   /**
-   * Show Sleep Monitor fragment
+   * @brief showScanBle
+   *
+   * Show SleepMonitor fragment
+   *
+   * @return NULL
    */
   private void showSleepMonitor()
   {
 
+  }
+
+  /**
+   * @brief bleInit
+   *
+   * Initialize BLE module
+   *
+   * @return NULL
+   */
+  private void bleInit()
+  {
+    mDemoBle = new DemoBle(MainActivity.this, mDemoBleEvent);
+  }
+
+  /**
+   * @brief bleUnInit
+   *
+   * Un-initialize BLE module
+   *
+   * @return NULL
+   */
+  private void bleUnInit()
+  {
+    if(mDemoBle == null)
+    {
+      return;
+    }
+
+    if(mDemoBle.isConnect())
+    {
+      mDemoBle.disconnect();
+    }
+
+    mDemoBle.destroy();
+    mDemoBle = null;
+  }
+
+  /**
+   * @brief mDemoBleEvent
+   *
+   * Callback of DemoBle.DemoBleEvent
+   *
+   */
+  private DemoBle.DemoBleEvent mDemoBleEvent = new DemoBle.DemoBleEvent()
+  {
+    @Override
+    public void onDisconnect() {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(getApplicationContext(), "Disconnection with device", Toast.LENGTH_LONG).show();
+        }
+      });
+    }
+
+    @Override
+    public void onConnect() {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(getApplicationContext(), "Connection with device", Toast.LENGTH_LONG).show();
+        }
+      });
+    }
+  };
+
+  /**
+   * @brief onBleDeviceSelected
+   *
+   * Callback of DeviceListFragment
+   *
+   */
+  @Override
+  public void onBleDeviceSelected(String strDeviceAddress)
+  {
+    if(strDeviceAddress == null)
+    {
+      Log.d(LOG_TAG, "Device address is null");
+      return;
+    }
+
+    if(mDemoBle != null)
+    {
+      /// [CC] : Connect BLE device ; 08/21/2017
+      mDemoBle.connect(strDeviceAddress);
+    }
+  }
+
+  /**
+   * @brief onDfuDeviceSelected
+   *
+   * Callback of DeviceListFragment
+   *
+   */
+  @Override
+  public void onDfuDeviceSelected(BluetoothDevice bluetoothDevice) {
+    Log.d(LOG_TAG, "onDfuDeviceSelected");
+  }
+
+  /**
+   * @brief onSendCrashMsg
+   *
+   * Callback of DeviceListFragment
+   *
+   */
+  @Override
+  public void onSendCrashMsg(String s, String s1) {
+    Log.d(LOG_TAG, "onSendCrashMsg");
   }
 }
