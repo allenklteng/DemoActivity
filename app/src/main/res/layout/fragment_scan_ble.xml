@@ -2,17 +2,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.vitalsigns.demoactivity.fragment.ScanBleFragment">
 
   <TextView
       android:id="@+id/textview_scan_ble"
       app:layout_widthPercent="50%"
       app:layout_heightPercent="10%"
-      android:layout_height="wrap_content"
       android:text="@string/scan_ble_text"
       android:layout_centerInParent="true"
       android:gravity="center"
       android:textColor="@android:color/black"
       android:background="@drawable/scan_ble_textview_background"/>
+  <TextView
+      android:id="@+id/textview_device_name"
+      android:layout_width="match_parent"
+      app:layout_heightPercent="20%"
+      android:layout_centerVertical="true"
+      android:layout_centerHorizontal="true"
+      android:gravity="center"
+      android:layout_above="@+id/textview_scan_ble"
+      android:textColor="@android:color/black"/>
 </android.support.percent.PercentRelativeLayout>

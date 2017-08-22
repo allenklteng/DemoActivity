@@ -40,7 +40,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   public interface DemoBleEvent
   {
     void onDisconnect();
-    void onConnect();
+    void onConnect(String strName);
     void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
     void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
   }
@@ -184,6 +184,26 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     return (false);
   }
 
+  /**
+   * @brief getDeviceName
+   *
+   * Get device name
+   *
+   * @return device name
+   */
+  public String getDeviceName()
+  {
+    if(mBleService != null)
+    {
+      return (mBleService.GetBleDevice().getName());
+    }
+    else
+    {
+      return (null);
+    }
+
+  }
+
   @Override
   public void chartNumberConfig(int i, int i1, int[] ints) {
     Log.d(LOG_TAG, "chartNumberConfig()");
@@ -215,7 +235,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     Log.d(LOG_TAG, "bleReadyToGetData()");
     if(mDemoBleEvent != null)
     {
-      mDemoBleEvent.onConnect();
+      mDemoBleEvent.onConnect(mBleService.GetBleDevice().getName());
     }
   }
 

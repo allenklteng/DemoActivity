@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.vitalsigns.demoactivity.ble.DemoBle;
 import com.vitalsigns.demoactivity.fragment.PedometerFragment;
 import com.vitalsigns.demoactivity.fragment.ScanBleFragment;
@@ -176,9 +175,17 @@ public class MainActivity extends AppCompatActivity
    */
   private void showScanBle()
   {
+    Bundle bundle;
     ScanBleFragment fragment;
     fragment = new ScanBleFragment();
+    bundle = new Bundle();
 
+    if(mDemoBle.isConnect())
+    {
+      bundle.putString(getString(R.string.connected_text), mDemoBle.getDeviceName());
+    }
+
+    fragment.setArguments(bundle);
     fragment.SetCallback(scanBleFragmentListener);
     getFragmentManager().beginTransaction().replace(R.id.fragment_container_layout,
                                                     fragment,
@@ -378,7 +385,19 @@ public class MainActivity extends AppCompatActivity
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          Toast.makeText(getApplicationContext(), "Disconnection with device", Toast.LENGTH_LONG).show();
+          String strTag;
+          ScanBleFragment fragment;
+
+          strTag = getResources().getString(R.string.fragment_tag_scan_ble);
+          fragment = (ScanBleFragment) getFragmentManager().findFragmentByTag(strTag);
+
+          if(fragment != null)
+          {
+            /// [CC] : Reset scan fragment text ; 08/22/2017
+            fragment.showConnectedDeviceName(null);
+            fragment.setScanButtonText(getString(R.string.scan_ble_text));
+          }
+
           pedometerDataSyncStop(0, null);
           sleepMonitorDataSyncStop(null);
         }
@@ -386,11 +405,31 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnect() {
+    public void onConnect(final String strName) {
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          Toast.makeText(getApplicationContext(), "Connection with device", Toast.LENGTH_LONG).show();
+          String strTag;
+          ScanBleFragment fragment;
+
+          strTag = getResources().getString(R.string.fragment_tag_scan_ble);
+          fragment = (ScanBleFragment) getFragmentManager().findFragmentByTag(strTag);
+
+          if(fragment != null)
+          {
+            if(strName != null)
+            {
+              /// [CC] : Set scan fragment text if connected ; 08/22/2017
+              fragment.showConnectedDeviceName(strName);
+              fragment.setScanButtonText(getString(R.string.disconnect_text));
+            }
+            else
+            {
+              /// [CC] : Reset scan fragment text ; 08/22/2017
+              fragment.showConnectedDeviceName(null);
+              fragment.setScanButtonText(getString(R.string.scan_ble_text));
+            }
+          }
         }
       });
     }

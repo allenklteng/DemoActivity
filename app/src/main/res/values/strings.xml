@@ -8,6 +8,8 @@
   <string name="request_permission_coarse_location_title">This app needs location access</string>
   <string name="request_permission_coarse_location_content">Please grant location access so this app.</string>
   <string name="scan_ble_text">Scan Device</string>
+  <string name="connected_text">Connected</string>
+  <string name="disconnect_text">Disconnect</string>
   <string name="fragment_tag_scan_ble">fragment_tag_scan_ble</string>
   <string name="fragment_tag_connect_device_first">Please connect BLE device first</string>
   <string name="fragment_tag_connect_first_title">Notice</string>
