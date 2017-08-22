@@ -23,7 +23,7 @@ public class Utility
   }
 
   /**
-   * @brief RequestPermissionAccessExternalStorage
+   * @brief requestPermissionAccessExternalStorage
    *
    * Request permission to access external storage
    *
@@ -34,7 +34,7 @@ public class Utility
    *
    * @return true if permission granted
    */
-  public static boolean RequestPermissionAccessExternalStorage(final Activity activity,
+  public static boolean requestPermissionAccessExternalStorage(final Activity activity,
                                                                String title,
                                                                String message,
                                                                final OnCancel onCancel)
@@ -79,7 +79,7 @@ public class Utility
   }
 
   /**
-   * @brief RequestPermissionAccessCoarseLocation
+   * @brief requestPermissionAccessCoarseLocation
    *
    * Request permission to access coarse location
    *
@@ -90,7 +90,7 @@ public class Utility
    *
    * @return true if permission granted
    */
-  public static boolean RequestPermissionAccessCoarseLocation(final Activity activity,
+  public static boolean requestPermissionAccessCoarseLocation(final Activity activity,
                                                               String title,
                                                               String message,
                                                               final OnCancel onCancel)

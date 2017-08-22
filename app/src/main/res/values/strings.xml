@@ -11,4 +11,9 @@
   <string name="fragment_tag_scan_ble">fragment_tag_scan_ble</string>
   <string name="fragment_tag_pedometer">fragment_tag_pedometer</string>
   <string name="pedometer_data_loading">Pedometer data loading, please wait</string>
+  <string name="device_connection_first_btn_text">OK</string>
+  <string name="device_connection_check">device_connection_check</string>
+  <string name="fragment_tag_connect_first_title">Notice</string>
+  <string name="fragment_tag_connect_device_first">Please connect BLE device first</string>
+  <string name="fragment_tag_no_pedometer_data">There is no pedometer data from device</string>
 </resources>

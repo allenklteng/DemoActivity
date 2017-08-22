@@ -41,6 +41,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   {
     void onDisconnect();
     void onConnect();
+    void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
   }
 
   /**
@@ -169,6 +170,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   @Override
   public void pedometerData(int i, ArrayList<BlePedometerData> arrayList) {
     Log.d(LOG_TAG, "pedometerData()");
+    mDemoBleEvent.onGetPedometerDataFinish(i, arrayList);
   }
 
   @Override
