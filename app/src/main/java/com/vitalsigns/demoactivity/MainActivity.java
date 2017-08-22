@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.vitalsigns.demoactivity.ble.DemoBle;
 import com.vitalsigns.demoactivity.fragment.PedometerFragment;
 import com.vitalsigns.demoactivity.fragment.ScanBleFragment;
+import com.vitalsigns.demoactivity.fragment.SleepMonitorFragment;
 import com.vitalsigns.sdk.ble.BlePedometerData;
 import com.vitalsigns.sdk.ble.scan.DeviceListFragment;
 
@@ -278,8 +279,41 @@ public class MainActivity extends AppCompatActivity
    */
   private void showSleepMonitor()
   {
+    SleepMonitorFragment fragment;
+    Bundle bundle;
+    fragment = new SleepMonitorFragment();
+    bundle = new Bundle();
 
+    if(mDemoBle != null)
+    {
+      bundle.putBoolean(getString(R.string.device_connection_check), mDemoBle.isConnect());
+    }
+    else
+    {
+      bundle.putBoolean(getString(R.string.device_connection_check), false);
+    }
+
+    fragment.setArguments(bundle);
+    fragment.SetCallback(sleepMonitorFragmentListener);
+    getFragmentManager().beginTransaction().replace(R.id.fragment_container_layout,
+                                                    fragment,
+                                                    getString(R.string.fragment_tag_sleep_monitor))
+                                           .commitAllowingStateLoss();
   }
+
+  /**
+   * @brief sleepMonitorFragmentListener
+   *
+   * Callback of SleepMonitorFragment
+   *
+   */
+  private SleepMonitorFragment.OnSleepMonitorFragmentListener sleepMonitorFragmentListener = new SleepMonitorFragment.OnSleepMonitorFragmentListener()
+  {
+    @Override
+    public void onConnectionFirst() {
+      showConnectFirstDialog();
+    }
+  };
 
   /**
    * @brief bleInit

@@ -3,12 +3,12 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context="com.vitalsigns.demoactivity.fragment.PedometerFragment">
+  tools:context="com.vitalsigns.demoactivity.fragment.SleepMonitorFragment">
   <HorizontalScrollView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
     <TableLayout
-      android:id="@+id/pedometer_table_layout"
+      android:id="@+id/sleep_monitor_table_layout"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content">
     </TableLayout>

@@ -71,11 +71,6 @@ public class PedometerFragment extends Fragment
     getPedometerData();
   }
 
-  @Override
-  public void onStop() {
-    super.onStop();
-  }
-
   /**
    * @brief SetCallback
    *
