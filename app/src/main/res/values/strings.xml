@@ -9,4 +9,6 @@
   <string name="request_permission_coarse_location_content">Please grant location access so this app</string>
   <string name="scan_ble_text">Scan Device</string>
   <string name="fragment_tag_scan_ble">fragment_tag_scan_ble</string>
+  <string name="fragment_tag_pedometer">fragment_tag_pedometer</string>
+  <string name="pedometer_data_loading">Pedometer data loading, please wait</string>
 </resources>

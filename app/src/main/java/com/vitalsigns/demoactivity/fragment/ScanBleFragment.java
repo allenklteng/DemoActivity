@@ -68,7 +68,7 @@ public class ScanBleFragment extends Fragment
   /**
    * @brief SetCallback
    *
-   * Set callback
+   * Set scanBle fragment callback
    *
    * @return NULL
    */

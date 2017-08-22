@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.vitalsigns.demoactivity.ble.DemoBle;
+import com.vitalsigns.demoactivity.fragment.PedometerFragment;
 import com.vitalsigns.demoactivity.fragment.ScanBleFragment;
 import com.vitalsigns.sdk.ble.scan.DeviceListFragment;
 
@@ -207,8 +208,32 @@ public class MainActivity extends AppCompatActivity
    */
   private void showPedometer()
   {
+    PedometerFragment fragment;
+    fragment = new PedometerFragment();
 
+    fragment.SetCallback(pedometerFragmentListener);
+    getFragmentManager().beginTransaction().replace(R.id.fragment_container_layout,
+      fragment,
+      getString(R.string.fragment_tag_pedometer))
+      .commitAllowingStateLoss();
   }
+
+  private PedometerFragment.OnPedometerFragmentListener pedometerFragmentListener = new PedometerFragment.OnPedometerFragmentListener()
+  {
+    @Override
+    public void onGetPedometerData() {
+      if(mDemoBle == null)
+      {
+        pedometerDataSyncStop();
+        return;
+      }
+
+      if(!mDemoBle.getPedometerData())
+      {
+        pedometerDataSyncStop();
+      }
+    }
+  };
 
   /**
    * @brief showScanBle
@@ -328,5 +353,22 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void onSendCrashMsg(String s, String s1) {
     Log.d(LOG_TAG, "onSendCrashMsg");
+  }
+
+  /**
+   * @brief pedometerDataSyncStop
+   *
+   * Stop sync pedometer data
+   *
+   * @return NULL
+   */
+  private void pedometerDataSyncStop()
+  {
+    runOnUiThread(new Runnable()
+    {
+      @Override
+      public void run() {
+      }
+    });
   }
 }

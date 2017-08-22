@@ -122,7 +122,11 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   }
 
   /**
-   * Destroy the VitalSignsBle object
+   * @brief destroy
+   *
+   * Disconnect to BLE device
+   *
+   * @return NULL
    */
   public void destroy()
   {
@@ -134,6 +138,27 @@ public class DemoBle  implements BleCmdService.OnServiceListener
         mDemoBleEvent = null;
       }
     }
+  }
+
+  /**
+   * @brief getPedometerData
+   *
+   * Get pedometer data from device
+   *
+   * @return true if request success
+   */
+  public boolean getPedometerData()
+  {
+    if((mBleService != null) &&
+       (mBleService.IsBleConnected()) &&
+       (mBleService.GetBleDevice().getName() != null) &&
+       ((mBleService.GetBleDevice().getName().contains("VSW"))))
+    {
+      mBleService.CmdSyncPedometer();
+      return (true);
+    }
+
+    return (false);
   }
 
   @Override
