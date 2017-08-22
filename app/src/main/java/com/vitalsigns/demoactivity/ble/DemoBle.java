@@ -42,6 +42,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     void onDisconnect();
     void onConnect();
     void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
+    void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
   }
 
   /**
@@ -162,6 +163,27 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     return (false);
   }
 
+  /**
+   * @brief getSleepMonitorData
+   *
+   * Get sleep monitor data from device
+   *
+   * @return true if request success
+   */
+  public boolean getSleepMonitorData()
+  {
+    if((mBleService != null) &&
+      (mBleService.IsBleConnected()) &&
+      (mBleService.GetBleDevice().getName() != null) &&
+      ((mBleService.GetBleDevice().getName().contains("VSW"))))
+    {
+      mBleService.CmdSyncSleep();
+      return (true);
+    }
+
+    return (false);
+  }
+
   @Override
   public void chartNumberConfig(int i, int i1, int[] ints) {
     Log.d(LOG_TAG, "chartNumberConfig()");
@@ -176,6 +198,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   @Override
   public void sleepData(int i, int i1, ArrayList<BleSleepData> arrayList) {
     Log.d(LOG_TAG, "sleepData()");
+    mDemoBleEvent.onGetSleepMonitorDataFinish(arrayList);
   }
 
   @Override

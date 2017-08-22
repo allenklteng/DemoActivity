@@ -17,6 +17,7 @@ import com.vitalsigns.demoactivity.fragment.PedometerFragment;
 import com.vitalsigns.demoactivity.fragment.ScanBleFragment;
 import com.vitalsigns.demoactivity.fragment.SleepMonitorFragment;
 import com.vitalsigns.sdk.ble.BlePedometerData;
+import com.vitalsigns.sdk.ble.BleSleepData;
 import com.vitalsigns.sdk.ble.scan.DeviceListFragment;
 
 import java.util.ArrayList;
@@ -310,6 +311,20 @@ public class MainActivity extends AppCompatActivity
   private SleepMonitorFragment.OnSleepMonitorFragmentListener sleepMonitorFragmentListener = new SleepMonitorFragment.OnSleepMonitorFragmentListener()
   {
     @Override
+    public void onGetSleepMonitorData() {
+      if(mDemoBle == null)
+      {
+        sleepMonitorDataSyncStop(null);
+        return;
+      }
+
+      if(!mDemoBle.getSleepMonitorData())
+      {
+        sleepMonitorDataSyncStop(null);
+      }
+    }
+
+    @Override
     public void onConnectionFirst() {
       showConnectFirstDialog();
     }
@@ -365,7 +380,7 @@ public class MainActivity extends AppCompatActivity
         public void run() {
           Toast.makeText(getApplicationContext(), "Disconnection with device", Toast.LENGTH_LONG).show();
           pedometerDataSyncStop(0, null);
-          //sleepMonitorDataSyncStop(0, null);
+          sleepMonitorDataSyncStop(null);
         }
       });
     }
@@ -383,6 +398,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList) {
       pedometerDataSyncStop(nDataCnt ,arrayList);
+    }
+
+    @Override
+    public void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList) {
+      sleepMonitorDataSyncStop(arrayList);
     }
   };
 
@@ -460,7 +480,7 @@ public class MainActivity extends AppCompatActivity
           if((nDatCnt <= 0) || (dataArrayList == null))
           {
             /// [CC] : Show dialog if no pedometer data from device ; 08/22/2017
-            noPedometerDataNotice();
+            noDataNotice(getString(R.string.fragment_tag_no_pedometer_data));
           }
         }
       }
@@ -501,18 +521,20 @@ public class MainActivity extends AppCompatActivity
   }
 
   /**
-   * @brief noPedometerDataNotice
+   * @brief noDataNotice
    *
-   * There is no pedometer data from device
+   * There is no data from device
+   *
+   * @param strMsg notice message
    *
    * @return NULL
    */
-  private void noPedometerDataNotice()
+  private void noDataNotice(String strMsg)
   {
     /// [CC] : Show dialog notice user no pedometer ; 08/22/2017
     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
     builder.setTitle(getString(R.string.fragment_tag_connect_first_title));
-    builder.setMessage(getString(R.string.fragment_tag_no_pedometer_data));
+    builder.setMessage(strMsg);
 
     /// [CC] : Set click "OK" event ; 08/22/2017
     builder.setPositiveButton(getString(R.string.device_connection_first_btn_text),
@@ -531,5 +553,42 @@ public class MainActivity extends AppCompatActivity
       });
     builder.setCancelable(false);
     builder.show();
+  }
+
+  /**
+   * @brief sleepMonitorDataSyncStop
+   *
+   * Stop sync sleep monitor data
+   *
+   * @pararm nDatCnt data count
+   * @pararm dataArrayList data array
+   *
+   * @return NULL
+   */
+  private void sleepMonitorDataSyncStop(final ArrayList<BleSleepData> dataArrayList)
+  {
+    runOnUiThread(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        SleepMonitorFragment fragment;
+        String strTag;
+
+        strTag = getResources().getString(R.string.fragment_tag_sleep_monitor);
+        fragment = (SleepMonitorFragment) getFragmentManager().findFragmentByTag(strTag);
+
+        if((fragment != null) && (fragment.isAdded()))
+        {
+          fragment.displayData(dataArrayList);
+
+          if((dataArrayList == null) || (dataArrayList.size() <= 0))
+          {
+            /// [CC] : Show dialog if no sleep monitor data from device ; 08/22/2017
+            noDataNotice(getString(R.string.fragment_tag_no_sleep_monitor_data));
+          }
+        }
+      }
+    });
   }
 }

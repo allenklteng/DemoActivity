@@ -25,8 +25,8 @@ import java.util.ArrayList;
 public class PedometerFragment extends Fragment
 {
   private static final String LOG_TAG = "PedometerFragment:";
-  private static final float TABLELAYUOT_TEXT_SIZE = (25f);
-  private static final int TABLELAYUOT_TEXT_PADDING = (10);
+  private static final float TABLELAYOUT_TEXT_SIZE = (25f);
+  private static final int TABLELAYOUT_TEXT_PADDING = (10);
   private OnPedometerFragmentListener mListener;
   private ProgressDialog mProgressDialog;
 
@@ -71,10 +71,18 @@ public class PedometerFragment extends Fragment
     getPedometerData();
   }
 
+  @Override
+  public void onStop() {
+    super.onStop();
+    hideProgressDialog();
+  }
+
   /**
    * @brief SetCallback
    *
    * Set pedometer fragment callback
+   *
+   * @param callback
    *
    * @return NULL
    */
@@ -159,6 +167,9 @@ public class PedometerFragment extends Fragment
    *
    * Use table display data
    *
+   * @param nDatCnt
+   * @param dataArrayList BlePedometerData array
+   *
    * @return
    */
   public void displayData(int nDatCnt, ArrayList<BlePedometerData> dataArrayList)
@@ -193,7 +204,7 @@ public class PedometerFragment extends Fragment
    *
    * Save pedometer data as csv file
    *
-   * @para arrayList BlePedometerData array
+   * @param arrayList BlePedometerData array
    *
    * @return NULL
    */
@@ -238,7 +249,7 @@ public class PedometerFragment extends Fragment
    *
    * Show pedometer data
    *
-   * @para arrayList BlePedometerData array
+   * @param arrayList BlePedometerData array
    *
    * @return NULL
    */
@@ -264,6 +275,16 @@ public class PedometerFragment extends Fragment
     }
   }
 
+  /**
+   * @brief setTableRaw
+   *
+   * Set raw data to Tablelayout
+   *
+   * @param tableLayout TableLayout
+   * @param strTitle
+   *
+   * @return NULL
+   */
   private void setTableRaw(TableLayout tableLayout, String[] strTitle)
   {
     int nIdx;
@@ -272,14 +293,14 @@ public class PedometerFragment extends Fragment
     TextView textView;
 
     tableRow = new TableRow(getView().getContext());
-    nPadding = TABLELAYUOT_TEXT_PADDING;
+    nPadding = TABLELAYOUT_TEXT_PADDING;
 
     for (nIdx = 0; nIdx < strTitle.length; nIdx++)
     {
       textView = new TextView(getView().getContext());
 
       textView.setText(strTitle[nIdx]);
-      textView.setTextSize(TABLELAYUOT_TEXT_SIZE);
+      textView.setTextSize(TABLELAYOUT_TEXT_SIZE);
       textView.setPadding(nPadding, nPadding, nPadding, nPadding);
       textView.setGravity(Gravity.CENTER);
       textView.setBackground(ContextCompat.getDrawable(getView().getContext(), R.drawable.table_frame));
