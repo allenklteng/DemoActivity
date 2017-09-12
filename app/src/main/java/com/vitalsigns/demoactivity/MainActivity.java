@@ -515,6 +515,7 @@ public class MainActivity extends AppCompatActivity
         if((fragment != null) && (fragment.isAdded()))
         {
           fragment.displayData(nDatCnt, dataArrayList);
+          fragment.updateCurrentStep(0);
 
           if((nDatCnt <= 0) || (dataArrayList == null))
           {

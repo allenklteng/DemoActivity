@@ -309,4 +309,28 @@ public class PedometerFragment extends Fragment
 
     tableLayout.addView(tableRow);
   }
+
+  /**
+   * @brief updateCurrentStep
+   *
+   * Update current steps real time
+   *
+   * @param steps steps to be updated
+   * @return NULL
+   */
+  public void updateCurrentStep(final int steps)
+  {
+    getActivity().runOnUiThread(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        View view = getView();
+        if(view != null)
+        {
+          ((TextView)view.findViewById(R.id.pedometer_current_step)).setText(String.format("%d", steps));
+        }
+      }
+    });
+  }
 }
