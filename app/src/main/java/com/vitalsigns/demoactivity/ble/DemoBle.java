@@ -26,7 +26,11 @@ import static android.content.Context.BIND_AUTO_CREATE;
  * Created by coge on 2017/8/21.
  */
 
-public class DemoBle  implements BleCmdService.OnServiceListener
+public class DemoBle implements BleCmdService.OnDataListener,
+                                BleCmdService.OnErrorListener,
+                                BleCmdService.OnStatusListener,
+                                BleCmdService.OnAckListener,
+                                BleCmdService.OnBleRawListener
 {
   private static final String LOG_TAG = "DemoBle:";
   private static final int BLE_DATA_QUEUE_SIZE = 128;
@@ -43,6 +47,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     void onConnect(String strName);
     void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
     void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
+    void onGetTodaySteps(int steps);
   }
 
   /**
@@ -69,7 +74,7 @@ public class DemoBle  implements BleCmdService.OnServiceListener
     {
       mBleService = ((BleService.LocalBinder)iBinder).getService();
       mBleService.Initialize(mBleIntDataQueue, BleCmdService.HW_TYPE.SENSE);
-      mBleService.RegisterClient(DemoBle.this);
+      mBleService.RegisterClient(DemoBle.this, DemoBle.this, DemoBle.this, DemoBle.this, DemoBle.this);
     }
 
     @Override
@@ -222,6 +227,12 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   }
 
   @Override
+  public void todayStep(int i)
+  {
+    mDemoBleEvent.onGetTodaySteps(i);
+  }
+
+  @Override
   public void bleConnectionLost(String s) {
     Log.d(LOG_TAG, "bleConnectionLost()");
     if(mDemoBleEvent != null)
@@ -251,6 +262,18 @@ public class DemoBle  implements BleCmdService.OnServiceListener
   @Override
   public void bleOtaAck() {
     Log.d(LOG_TAG, "bleOtaAck()");
+  }
+
+  @Override
+  public void bleStopAck()
+  {
+
+  }
+
+  @Override
+  public void bleEcgReady()
+  {
+
   }
 
   @Override

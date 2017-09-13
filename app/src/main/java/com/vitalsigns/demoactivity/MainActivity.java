@@ -443,6 +443,12 @@ public class MainActivity extends AppCompatActivity
     public void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList) {
       sleepMonitorDataSyncStop(arrayList);
     }
+
+    @Override
+    public void onGetTodaySteps(int steps)
+    {
+      pedometerDataTodayStep(steps);
+    }
   };
 
   /**
@@ -515,7 +521,6 @@ public class MainActivity extends AppCompatActivity
         if((fragment != null) && (fragment.isAdded()))
         {
           fragment.displayData(nDatCnt, dataArrayList);
-          fragment.updateCurrentStep(0);
 
           if((nDatCnt <= 0) || (dataArrayList == null))
           {
@@ -620,6 +625,37 @@ public class MainActivity extends AppCompatActivity
             /// [CC] : Show dialog if no sleep monitor data from device ; 08/22/2017
             noDataNotice(getString(R.string.fragment_tag_no_sleep_monitor_data));
           }
+        }
+      }
+    });
+  }
+
+  /**
+   * @brief pedometerDataSyncStop
+   *
+   * Stop sync pedometer data
+   *
+   * @pararm nDatCnt data count
+   * @pararm dataArrayList data array
+   *
+   * @return NULL
+   */
+  private void pedometerDataTodayStep(final int nSteps)
+  {
+    runOnUiThread(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        PedometerFragment fragment;
+        String strTag;
+
+        strTag = getResources().getString(R.string.fragment_tag_pedometer);
+        fragment = (PedometerFragment) getFragmentManager().findFragmentByTag(strTag);
+
+        if((fragment != null) && (fragment.isAdded()))
+        {
+          fragment.updateCurrentStep(nSteps);
         }
       }
     });
