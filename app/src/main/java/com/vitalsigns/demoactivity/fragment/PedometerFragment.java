@@ -1,9 +1,11 @@
 package com.vitalsigns.demoactivity.fragment;
+
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -27,12 +29,16 @@ public class PedometerFragment extends Fragment
   private static final String LOG_TAG = "PedometerFragment:";
   private static final float TABLELAYOUT_TEXT_SIZE = (25f);
   private static final int TABLELAYOUT_TEXT_PADDING = (10);
+  private static final int UPDATE_TODAY_STEP_INTERVAL = 1000;
+
   private OnPedometerFragmentListener mListener;
   private ProgressDialog mProgressDialog;
+  private Handler mUpdateTodayStepHandler = null;
 
   public interface OnPedometerFragmentListener {
     void onGetPedometerData();
     void onConnectionFirst();
+    void onGetTodayStep();
   }
 
   public PedometerFragment() {
@@ -75,6 +81,12 @@ public class PedometerFragment extends Fragment
   public void onStop() {
     super.onStop();
     hideProgressDialog();
+
+    if(mUpdateTodayStepHandler != null)
+    {
+      mUpdateTodayStepHandler.removeCallbacksAndMessages(null);
+      mUpdateTodayStepHandler = null;
+    }
   }
 
   /**
@@ -174,6 +186,10 @@ public class PedometerFragment extends Fragment
    */
   public void displayData(int nDatCnt, ArrayList<BlePedometerData> dataArrayList)
   {
+    /// [AT-PM] : Start a runnable to update today step ; 09/13/2017
+    mUpdateTodayStepHandler = new Handler();
+    mUpdateTodayStepHandler.post(mUpdateTodayStepRunnable);
+
     /// [CC] Return if no data ; 08/22/2017
     if((nDatCnt <= 0) || (dataArrayList == null))
     {
@@ -333,4 +349,20 @@ public class PedometerFragment extends Fragment
       }
     });
   }
+
+  private Runnable mUpdateTodayStepRunnable = new Runnable()
+  {
+    @Override
+    public void run()
+    {
+      /// [AT-PM] : Get today steps ; 09/13/2017
+      mListener.onGetTodayStep();
+
+      /// [AT-PM] : Read value every 1 second ; 09/13/2017
+      if(mUpdateTodayStepHandler != null)
+      {
+        mUpdateTodayStepHandler.postDelayed(mUpdateTodayStepRunnable, UPDATE_TODAY_STEP_INTERVAL);
+      }
+    }
+  };
 }

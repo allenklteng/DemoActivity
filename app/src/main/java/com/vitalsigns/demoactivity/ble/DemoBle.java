@@ -333,4 +333,17 @@ public class DemoBle implements BleCmdService.OnDataListener,
   public void ackAlertGet(BleAlertData bleAlertData) {
     Log.d(LOG_TAG, "ackAlertGet()");
   }
+
+  /**
+   * @brief getTodayStep
+   *
+   * Send command to get today steps
+   *
+   * @return NULL
+   */
+  public void getTodayStep()
+  {
+    Log.d(LOG_TAG, "Request to read today steps");
+    mBleService.CmdTodayStep();
+  }
 }

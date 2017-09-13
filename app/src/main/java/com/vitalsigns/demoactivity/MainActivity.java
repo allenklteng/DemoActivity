@@ -276,6 +276,12 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionFirst() {
       showConnectFirstDialog();
     }
+
+    @Override
+    public void onGetTodayStep()
+    {
+      mDemoBle.getTodayStep();
+    }
   };
 
   /**
