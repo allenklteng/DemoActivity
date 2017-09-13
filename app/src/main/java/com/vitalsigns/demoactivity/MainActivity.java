@@ -580,14 +580,7 @@ public class MainActivity extends AppCompatActivity
       new DialogInterface.OnClickListener()
       {
         @Override
-        public void onClick(DialogInterface dialogInterface, int i)
-        {
-          /// [CC] : Set tabs color ; 08/22/2017
-          mTvScanBle.setTextColor(getResources().getColor(R.color.colorAccent));
-          mTvPedometer.setTextColor(getResources().getColor(R.color.colorWhite));
-          mTvSleepMonitor.setTextColor(getResources().getColor(R.color.colorWhite));
-
-          showScanBle();
+        public void onClick(DialogInterface dialogInterface, int i) {
         }
       });
     builder.setCancelable(false);
