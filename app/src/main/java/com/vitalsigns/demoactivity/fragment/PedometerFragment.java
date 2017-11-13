@@ -244,8 +244,9 @@ public class PedometerFragment extends Fragment
       bufferedWriter.newLine();
       for(BlePedometerData blePedometerData : arrayList)
       {
-        bufferedWriter.write(String.format("%d, %d, %d, %d,",
-                             blePedometerData.getDayOfWeek(),
+        bufferedWriter.write(String.format("%d/%d, %d, %d, %d,",
+                             blePedometerData.getMonth(),
+                             blePedometerData.getDay(),
                              blePedometerData.getTimeIndex(),
                              blePedometerData.getTotalStep(),
                              blePedometerData.getRunStep()));
@@ -282,7 +283,7 @@ public class PedometerFragment extends Fragment
     for (nDataCnt = 0; nDataCnt < arrayList.size(); nDataCnt++)
     {
       strTitle = new String[]{
-        String.valueOf(arrayList.get(nDataCnt).getDayOfWeek()),
+        String.format("%d/%d", arrayList.get(nDataCnt).getMonth(), arrayList.get(nDataCnt).getDay()),
         String.valueOf(arrayList.get(nDataCnt).getTimeIndex()),
         String.valueOf(arrayList.get(nDataCnt).getTotalStep()),
         String.valueOf(arrayList.get(nDataCnt).getRunStep())};

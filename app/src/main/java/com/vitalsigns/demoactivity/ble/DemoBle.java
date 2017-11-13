@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.vitalsigns.demoactivity.Utility;
 import com.vitalsigns.sdk.ble.BleAlertData;
 import com.vitalsigns.sdk.ble.BleCmdService;
 import com.vitalsigns.sdk.ble.BlePedometerData;
@@ -17,6 +18,7 @@ import com.vitalsigns.sdk.ble.BleSwitchData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -161,7 +163,18 @@ public class DemoBle implements BleCmdService.OnDataListener,
        (mBleService.GetBleDevice().getName() != null) &&
        ((mBleService.GetBleDevice().getName().contains("VSW"))))
     {
-      mBleService.CmdSyncPedometer();
+      /// [AT-PM] : Get data started from five days ago ; 11/13/2017
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_YEAR, -5);
+      Log.d(LOG_TAG, String.format("getPedometerData() from %d/%d %d:%d",
+                                   calendar.get(Calendar.MONTH),
+                                   calendar.get(Calendar.DAY_OF_MONTH),
+                                   calendar.get(Calendar.HOUR_OF_DAY),
+                                   calendar.get(Calendar.MINUTE)));
+      mBleService.CmdSyncPedometer(calendar.get(Calendar.MONTH),
+                                   calendar.get(Calendar.DAY_OF_MONTH),
+                                   calendar.get(Calendar.HOUR_OF_DAY),
+                                   calendar.get(Calendar.MINUTE));
       return (true);
     }
 
@@ -182,7 +195,18 @@ public class DemoBle implements BleCmdService.OnDataListener,
       (mBleService.GetBleDevice().getName() != null) &&
       ((mBleService.GetBleDevice().getName().contains("VSW"))))
     {
-      mBleService.CmdSyncSleep();
+      /// [AT-PM] : Get data started from five days ago ; 11/13/2017
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_YEAR, -5);
+      Log.d(LOG_TAG, String.format("getPedometerData() from %d/%d %d:%d",
+                                   calendar.get(Calendar.MONTH),
+                                   calendar.get(Calendar.DAY_OF_MONTH),
+                                   calendar.get(Calendar.HOUR_OF_DAY),
+                                   calendar.get(Calendar.MINUTE)));
+      mBleService.CmdSyncSleep(calendar.get(Calendar.MONTH),
+                               calendar.get(Calendar.DAY_OF_MONTH),
+                               calendar.get(Calendar.HOUR_OF_DAY),
+                               calendar.get(Calendar.MINUTE));
       return (true);
     }
 
@@ -345,5 +369,47 @@ public class DemoBle implements BleCmdService.OnDataListener,
   {
     Log.d(LOG_TAG, "Request to read today steps");
     mBleService.CmdTodayStep();
+  }
+
+  @Override
+  public void mfaData(byte[] bytes)
+  {
+    Log.d(LOG_TAG, "mfaData()");
+  }
+
+  @Override
+  public void tick(long tick)
+  {
+    Log.d(LOG_TAG, String.format("tick(%ld)", tick));
+  }
+
+  @Override
+  public void loopTick(long tick)
+  {
+    Log.d(LOG_TAG, String.format("loopTick(%ld)", tick));
+  }
+
+  @Override
+  public void ackPointer(boolean ack)
+  {
+    Log.d(LOG_TAG, String.format("ackPointer(%s)", Boolean.toString(ack)));
+  }
+
+  @Override
+  public void ackPasswordCheck(boolean pass)
+  {
+    Log.d(LOG_TAG, String.format("ackPasswordCheck(%s)", Boolean.toString(pass)));
+  }
+
+  @Override
+  public void ackTemperatureGet(ArrayList<Integer> list)
+  {
+    Log.d(LOG_TAG, String.format("ackTemperatureGet(%d)", list.size()));
+  }
+
+  @Override
+  public void ackNameGet(String name)
+  {
+    Log.d(LOG_TAG, String.format("ackNameGet(%s)", name));
   }
 }
