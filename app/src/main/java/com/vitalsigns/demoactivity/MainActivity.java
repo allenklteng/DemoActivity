@@ -2,6 +2,8 @@ package com.vitalsigns.demoactivity;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +23,8 @@ import com.vitalsigns.sdk.ble.scan.DeviceListFragment;
 
 import java.util.ArrayList;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+
 public class MainActivity extends AppCompatActivity
   implements DeviceListFragment.OnEvent
 {
@@ -29,12 +33,17 @@ public class MainActivity extends AppCompatActivity
   private TextView mTvPedometer;
   private TextView mTvSleepMonitor;
   private DemoBle mDemoBle;
+  private HandlerThread mThread = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    /// [AT-PM] : Create background thread ; 11/15/2017
+    mThread = new HandlerThread("Worker Thread", THREAD_PRIORITY_BACKGROUND);
+    mThread.start();
 
     /// [CC] : Permission request ; 08/21/2017
     Utility.requestPermissionAccessCoarseLocation(this,
@@ -259,17 +268,21 @@ public class MainActivity extends AppCompatActivity
   private PedometerFragment.OnPedometerFragmentListener pedometerFragmentListener = new PedometerFragment.OnPedometerFragmentListener()
   {
     @Override
-    public void onGetPedometerData() {
+    public ArrayList<BlePedometerData> onGetPedometerData()
+    {
       if(mDemoBle == null)
       {
-        pedometerDataSyncStop(0 ,null);
-        return;
+        return (null);
       }
 
-      if(!mDemoBle.getPedometerData())
+      ArrayList<BlePedometerData> pedometerData = mDemoBle.getPedometerData();
+      if(pedometerData == null)
       {
-        pedometerDataSyncStop(0 ,null);
+        /// [CC] : Show dialog if no pedometer data from device ; 08/22/2017
+        noDataNotice(getString(R.string.fragment_tag_no_pedometer_data));
+        return (null);
       }
+      return (pedometerData);
     }
 
     @Override
@@ -281,6 +294,16 @@ public class MainActivity extends AppCompatActivity
     public int onGetTodayStep()
     {
       return (mDemoBle.getTodayStep());
+    }
+
+    @Override
+    public Looper onGetLooper()
+    {
+      if(mThread == null)
+      {
+        return (null);
+      }
+      return (mThread.getLooper());
     }
   };
 
@@ -404,7 +427,6 @@ public class MainActivity extends AppCompatActivity
             fragment.setScanButtonText(getString(R.string.scan_ble_text));
           }
 
-          pedometerDataSyncStop(0, null);
           sleepMonitorDataSyncStop(null);
         }
       });
@@ -438,11 +460,6 @@ public class MainActivity extends AppCompatActivity
           }
         }
       });
-    }
-
-    @Override
-    public void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList) {
-      pedometerDataSyncStop(nDataCnt ,arrayList);
     }
 
     @Override
@@ -493,43 +510,6 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void onSendCrashMsg(String s, String s1) {
     Log.d(LOG_TAG, "onSendCrashMsg");
-  }
-
-  /**
-   * @brief pedometerDataSyncStop
-   *
-   * Stop sync pedometer data
-   *
-   * @pararm nDatCnt data count
-   * @pararm dataArrayList data array
-   *
-   * @return NULL
-   */
-  private void pedometerDataSyncStop(final int nDatCnt, final ArrayList<BlePedometerData> dataArrayList)
-  {
-    runOnUiThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        PedometerFragment fragment;
-        String strTag;
-
-        strTag = getResources().getString(R.string.fragment_tag_pedometer);
-        fragment = (PedometerFragment) getFragmentManager().findFragmentByTag(strTag);
-
-        if((fragment != null) && (fragment.isAdded()))
-        {
-          fragment.displayData(nDatCnt, dataArrayList);
-
-          if((nDatCnt <= 0) || (dataArrayList == null))
-          {
-            /// [CC] : Show dialog if no pedometer data from device ; 08/22/2017
-            noDataNotice(getString(R.string.fragment_tag_no_pedometer_data));
-          }
-        }
-      }
-    });
   }
 
   /**
@@ -628,5 +608,17 @@ public class MainActivity extends AppCompatActivity
         }
       }
     });
+  }
+
+  @Override
+  protected void onDestroy()
+  {
+    super.onDestroy();
+    if(mThread != null)
+    {
+      mThread.interrupt();
+      mThread.quit();
+      mThread = null;
+    }
   }
 }

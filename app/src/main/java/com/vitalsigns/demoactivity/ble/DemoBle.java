@@ -47,7 +47,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
   {
     void onDisconnect();
     void onConnect(String strName);
-    void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
     void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
   }
 
@@ -153,9 +152,9 @@ public class DemoBle implements BleCmdService.OnDataListener,
    *
    * Get pedometer data from device
    *
-   * @return true if request success
+   * @return pedometer data array
    */
-  public boolean getPedometerData()
+  public ArrayList<BlePedometerData> getPedometerData()
   {
     if((mBleService != null) &&
        (mBleService.IsBleConnected()) &&
@@ -174,10 +173,19 @@ public class DemoBle implements BleCmdService.OnDataListener,
                                    calendar.get(Calendar.DAY_OF_MONTH),
                                    calendar.get(Calendar.HOUR_OF_DAY),
                                    calendar.get(Calendar.MINUTE));
-      return (true);
-    }
 
-    return (false);
+      /// [AT-PM] : Wait data ready ; 11/15/2017
+      ArrayList<BlePedometerData> pedometerData = null;
+      while(pedometerData == null)
+      {
+        com.vitalsigns.sdk.utility.Utility.SleepSomeTime(100);
+        pedometerData = mBleService.GetPedometerData();
+        Log.d(LOG_TAG, String.format("getPedometerData() -> %s",
+                                     pedometerData == null ? "NULL" : Integer.toString(pedometerData.size())));
+      }
+      return (pedometerData);
+    }
+    return (null);
   }
 
   /**
@@ -240,7 +248,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
   @Override
   public void pedometerData(int i, ArrayList<BlePedometerData> arrayList) {
     Log.d(LOG_TAG, "pedometerData()");
-    mDemoBleEvent.onGetPedometerDataFinish(i, arrayList);
   }
 
   @Override

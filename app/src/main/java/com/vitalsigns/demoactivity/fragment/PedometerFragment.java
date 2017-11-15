@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -34,11 +35,14 @@ public class PedometerFragment extends Fragment
   private OnPedometerFragmentListener mListener;
   private ProgressDialog mProgressDialog;
   private Handler mUpdateTodayStepHandler = null;
+  private Handler mUpdatePedometerHandler = null;
 
-  public interface OnPedometerFragmentListener {
-    void onGetPedometerData();
+  public interface OnPedometerFragmentListener
+  {
+    ArrayList<BlePedometerData> onGetPedometerData();
     void onConnectionFirst();
     int onGetTodayStep();
+    Looper onGetLooper();
   }
 
   public PedometerFragment() {
@@ -118,7 +122,10 @@ public class PedometerFragment extends Fragment
     }
 
     showProgressDialog();
-    mListener.onGetPedometerData();
+
+    /// [AT-PM] : Start a thread to read pedometer data ; 11/15/2017
+    mUpdatePedometerHandler = new Handler(mListener.onGetLooper());
+    mUpdatePedometerHandler.post(mUpdatePedometerRunnable);
   }
 
   /**
@@ -179,19 +186,13 @@ public class PedometerFragment extends Fragment
    *
    * Use table display data
    *
-   * @param nDatCnt
    * @param dataArrayList BlePedometerData array
-   *
    * @return
    */
-  public void displayData(int nDatCnt, ArrayList<BlePedometerData> dataArrayList)
+  private void displayData(ArrayList<BlePedometerData> dataArrayList)
   {
-    /// [AT-PM] : Start a runnable to update today step ; 09/13/2017
-    mUpdateTodayStepHandler = new Handler();
-    mUpdateTodayStepHandler.post(mUpdateTodayStepRunnable);
-
     /// [CC] Return if no data ; 08/22/2017
-    if((nDatCnt <= 0) || (dataArrayList == null))
+    if(dataArrayList == null)
     {
       /// [CC] Hide Progress Dialog ; 08/22/2017
       hideProgressDialog();
@@ -354,6 +355,30 @@ public class PedometerFragment extends Fragment
       {
         mUpdateTodayStepHandler.postDelayed(mUpdateTodayStepRunnable, UPDATE_TODAY_STEP_INTERVAL);
       }
+    }
+  };
+
+  private Runnable mUpdatePedometerRunnable = new Runnable()
+  {
+    @Override
+    public void run()
+    {
+      /// [AT-PM] : Get pedometer data ; 11/15/2017
+      final ArrayList<BlePedometerData> pedometerData =  mListener.onGetPedometerData();
+
+      /// [AT-PM] : Update result ; 11/15/2017
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          displayData(pedometerData);
+        }
+      });
+
+      /// [AT-PM] : Start a runnable to update today step ; 09/13/2017
+      mUpdateTodayStepHandler = new Handler(mListener == null ? null : mListener.onGetLooper());
+      mUpdateTodayStepHandler.post(mUpdateTodayStepRunnable);
     }
   };
 }
