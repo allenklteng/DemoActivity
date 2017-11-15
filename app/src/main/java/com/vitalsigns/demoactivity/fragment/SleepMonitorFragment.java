@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -32,10 +34,13 @@ public class SleepMonitorFragment extends Fragment {
   private static final int TABLELAYOUT_TEXT_PADDING = (10);
   private OnSleepMonitorFragmentListener mListener;
   private ProgressDialog mProgressDialog;
+  private Handler mUpdateSleepMonitorDataHandler = null;
 
-  public interface OnSleepMonitorFragmentListener {
-    void onGetSleepMonitorData();
+  public interface OnSleepMonitorFragmentListener
+  {
+    ArrayList<BleSleepData> onGetSleepMonitorData();
     void onConnectionFirst();
+    Looper onGetLooper();
   }
 
   public SleepMonitorFragment() {
@@ -97,13 +102,23 @@ public class SleepMonitorFragment extends Fragment {
    *
    * @return NULL
    */
-  private void getSleepMonitorData() {
-    if (mListener == null) {
+  private void getSleepMonitorData()
+  {
+    if (mListener == null)
+    {
       return;
     }
 
     showProgressDialog();
-    mListener.onGetSleepMonitorData();
+
+    /// [AT-PM] : Start a handler to read sleep monitor data ; 11/15/2017
+    if(mUpdateSleepMonitorDataHandler != null)
+    {
+      mUpdateSleepMonitorDataHandler.removeCallbacksAndMessages(null);
+      mUpdateSleepMonitorDataHandler = null;
+    }
+    mUpdateSleepMonitorDataHandler = new Handler(mListener.onGetLooper());
+    mUpdateSleepMonitorDataHandler.post(mRunnableReadSleepMonitorData);
   }
 
   /**
@@ -160,10 +175,9 @@ public class SleepMonitorFragment extends Fragment {
    * Use table display data
    *
    * @param dataArrayList BleSleepData array
-   *
    * @return NULL
    */
-  public void displayData(ArrayList<BleSleepData> dataArrayList)
+  private void displayData(ArrayList<BleSleepData> dataArrayList)
   {
     /// [CC] Return if no data ; 08/22/2017
     if ((dataArrayList == null) || (dataArrayList.size() <= 0))
@@ -336,5 +350,36 @@ public class SleepMonitorFragment extends Fragment {
     }
 
     tableLayout.addView(tableRow);
+  }
+
+  private Runnable mRunnableReadSleepMonitorData = new Runnable()
+  {
+    @Override
+    public void run()
+    {
+      /// [AT-PM] : Read sleep monitor data ; 11/15/2017
+      final ArrayList<BleSleepData> sleepData = mListener.onGetSleepMonitorData();
+
+      /// [AT-PM] : Update result ; 11/15/2017
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          displayData(sleepData);
+        }
+      });
+    }
+  };
+
+  @Override
+  public void onDestroyView()
+  {
+    super.onDestroyView();
+    if(mUpdateSleepMonitorDataHandler != null)
+    {
+      mUpdateSleepMonitorDataHandler.removeCallbacksAndMessages(null);
+      mUpdateSleepMonitorDataHandler = null;
+    }
   }
 }

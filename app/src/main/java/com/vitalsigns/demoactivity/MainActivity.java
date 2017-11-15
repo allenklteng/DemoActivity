@@ -347,22 +347,43 @@ public class MainActivity extends AppCompatActivity
   private SleepMonitorFragment.OnSleepMonitorFragmentListener sleepMonitorFragmentListener = new SleepMonitorFragment.OnSleepMonitorFragmentListener()
   {
     @Override
-    public void onGetSleepMonitorData() {
+    public ArrayList<BleSleepData> onGetSleepMonitorData()
+    {
       if(mDemoBle == null)
       {
-        sleepMonitorDataSyncStop(null);
-        return;
+        return (null);
       }
 
-      if(!mDemoBle.getSleepMonitorData())
+      ArrayList<BleSleepData> sleepData = mDemoBle.getSleepMonitorData();
+      if(sleepData == null)
       {
-        sleepMonitorDataSyncStop(null);
+        runOnUiThread(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            /// [CC] : Show dialog if no sleep monitor data from device ; 08/22/2017
+            noDataNotice(getString(R.string.fragment_tag_no_sleep_monitor_data));
+          }
+        });
+        return (null);
       }
+      return (sleepData);
     }
 
     @Override
     public void onConnectionFirst() {
       showConnectFirstDialog();
+    }
+
+    @Override
+    public Looper onGetLooper()
+    {
+      if(mThread == null)
+      {
+        return (null);
+      }
+      return (mThread.getLooper());
     }
   };
 
@@ -426,8 +447,6 @@ public class MainActivity extends AppCompatActivity
             fragment.showConnectedDeviceName(null);
             fragment.setScanButtonText(getString(R.string.scan_ble_text));
           }
-
-          sleepMonitorDataSyncStop(null);
         }
       });
     }
@@ -460,11 +479,6 @@ public class MainActivity extends AppCompatActivity
           }
         }
       });
-    }
-
-    @Override
-    public void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList) {
-      sleepMonitorDataSyncStop(arrayList);
     }
   };
 
@@ -571,43 +585,6 @@ public class MainActivity extends AppCompatActivity
       });
     builder.setCancelable(false);
     builder.show();
-  }
-
-  /**
-   * @brief sleepMonitorDataSyncStop
-   *
-   * Stop sync sleep monitor data
-   *
-   * @pararm nDatCnt data count
-   * @pararm dataArrayList data array
-   *
-   * @return NULL
-   */
-  private void sleepMonitorDataSyncStop(final ArrayList<BleSleepData> dataArrayList)
-  {
-    runOnUiThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        SleepMonitorFragment fragment;
-        String strTag;
-
-        strTag = getResources().getString(R.string.fragment_tag_sleep_monitor);
-        fragment = (SleepMonitorFragment) getFragmentManager().findFragmentByTag(strTag);
-
-        if((fragment != null) && (fragment.isAdded()))
-        {
-          fragment.displayData(dataArrayList);
-
-          if((dataArrayList == null) || (dataArrayList.size() <= 0))
-          {
-            /// [CC] : Show dialog if no sleep monitor data from device ; 08/22/2017
-            noDataNotice(getString(R.string.fragment_tag_no_sleep_monitor_data));
-          }
-        }
-      }
-    });
   }
 
   @Override

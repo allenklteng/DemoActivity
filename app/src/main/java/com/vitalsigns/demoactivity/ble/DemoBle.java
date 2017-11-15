@@ -17,6 +17,7 @@ import com.vitalsigns.sdk.ble.BleSwitchData;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -47,7 +48,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
   {
     void onDisconnect();
     void onConnect(String strName);
-    void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
   }
 
   /**
@@ -193,14 +193,14 @@ public class DemoBle implements BleCmdService.OnDataListener,
    *
    * Get sleep monitor data from device
    *
-   * @return true if request success
+   * @return BleSleepData array
    */
-  public boolean getSleepMonitorData()
+  public ArrayList<BleSleepData> getSleepMonitorData()
   {
     if((mBleService != null) &&
-      (mBleService.IsBleConnected()) &&
-      (mBleService.GetBleDevice().getName() != null) &&
-      ((mBleService.GetBleDevice().getName().contains("VSW"))))
+       (mBleService.IsBleConnected()) &&
+       (mBleService.GetBleDevice().getName() != null) &&
+       ((mBleService.GetBleDevice().getName().contains("VSW"))))
     {
       /// [AT-PM] : Get data started from five days ago ; 11/13/2017
       Calendar calendar = Calendar.getInstance();
@@ -214,10 +214,19 @@ public class DemoBle implements BleCmdService.OnDataListener,
                                calendar.get(Calendar.DAY_OF_MONTH),
                                calendar.get(Calendar.HOUR_OF_DAY),
                                calendar.get(Calendar.MINUTE));
-      return (true);
-    }
 
-    return (false);
+      /// [AT-PM] : Wait data ready ; 11/15/2017
+      ArrayList<BleSleepData> sleepData = null;
+      while(sleepData == null)
+      {
+        com.vitalsigns.sdk.utility.Utility.SleepSomeTime(100);
+        sleepData = mBleService.GetSleepData();
+        Log.d(LOG_TAG, String.format("getSleepMonitorData() -> %s",
+                                     sleepData == null ? "NULL" : Integer.toString(sleepData.size())));
+      }
+      return (sleepData);
+    }
+    return (null);
   }
 
   /**
@@ -253,7 +262,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
   @Override
   public void sleepData(int i, int i1, ArrayList<BleSleepData> arrayList) {
     Log.d(LOG_TAG, "sleepData()");
-    mDemoBleEvent.onGetSleepMonitorDataFinish(arrayList);
   }
 
   @Override
