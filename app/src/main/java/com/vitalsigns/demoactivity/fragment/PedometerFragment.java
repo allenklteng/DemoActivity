@@ -381,4 +381,20 @@ public class PedometerFragment extends Fragment
       mUpdateTodayStepHandler.post(mUpdateTodayStepRunnable);
     }
   };
+
+  @Override
+  public void onDestroyView()
+  {
+    super.onDestroyView();
+    if(mUpdatePedometerHandler != null)
+    {
+      mUpdatePedometerHandler.removeCallbacksAndMessages(null);
+      mUpdatePedometerHandler = null;
+    }
+    if(mUpdateTodayStepHandler != null)
+    {
+      mUpdateTodayStepHandler.removeCallbacksAndMessages(null);
+      mUpdateTodayStepHandler = null;
+    }
+  }
 }
