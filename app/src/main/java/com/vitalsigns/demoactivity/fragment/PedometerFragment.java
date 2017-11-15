@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PedometerFragment extends Fragment
@@ -31,6 +32,9 @@ public class PedometerFragment extends Fragment
   private static final float TABLELAYOUT_TEXT_SIZE = (25f);
   private static final int TABLELAYOUT_TEXT_PADDING = (10);
   private static final int UPDATE_TODAY_STEP_INTERVAL = 1000;
+
+  private final static int DEFAULT_USER_HEIGHT = 170;
+  private final static int DEFAULT_USER_WEIGHT = 70;
 
   private OnPedometerFragmentListener mListener;
   private ProgressDialog mProgressDialog;
@@ -230,6 +234,8 @@ public class PedometerFragment extends Fragment
     String strFilename;
     FileWriter fileWriter;
     BufferedWriter bufferedWriter;
+    float fDistance;
+    float fCalorie;
 
     strFilename = Environment.getExternalStorageDirectory().getAbsolutePath() +
       File.separator + "PedometerData." + Utility.GetFileDateTime() + ".csv";
@@ -240,17 +246,22 @@ public class PedometerFragment extends Fragment
       bufferedWriter = new BufferedWriter(fileWriter);
 
       /// [CC] : Title ; 08/22/2017
-      bufferedWriter.write("Day of week, Time region, Step Count, Run Count");
+      bufferedWriter.write("Day of week, Time region, Step Count, Run Count, Distance(KM), Calorie(KCAL)");
 
       bufferedWriter.newLine();
       for(BlePedometerData blePedometerData : arrayList)
       {
-        bufferedWriter.write(String.format("%d/%d, %d, %d, %d,",
+        fDistance = BlePedometerData.getDistance(blePedometerData.getTotalStep(), DEFAULT_USER_HEIGHT);
+        fCalorie = BlePedometerData.getCalorie(fDistance, DEFAULT_USER_WEIGHT);
+
+        bufferedWriter.write(String.format("%d/%d, %d, %d, %d, %f, %f",
                              blePedometerData.getMonth(),
                              blePedometerData.getDay(),
                              blePedometerData.getTimeIndex(),
                              blePedometerData.getTotalStep(),
-                             blePedometerData.getRunStep()));
+                             blePedometerData.getRunStep(),
+                             fDistance,
+                             fCalorie));
         bufferedWriter.newLine();
       }
       bufferedWriter.close();
@@ -275,20 +286,29 @@ public class PedometerFragment extends Fragment
   {
     TableLayout tableLayout;
     String[] strTitle;
+    DecimalFormat df;
     int nDataCnt;
+    float fDistance;
+    float fCalorie;
 
     tableLayout = (TableLayout) getView().findViewById(R.id.pedometer_table_layout);
-    strTitle = new String[]{"Day of week", "Time region", "Step Count", "Run Count"};
+    strTitle = new String[]{"Day of week", "Time region", "Step Count", "Run Count", "Distance(KM)", "Calorie(KCAL)"};
+
     setTableRaw(tableLayout, strTitle);
+    df = new DecimalFormat("#.##");
 
     for (nDataCnt = 0; nDataCnt < arrayList.size(); nDataCnt++)
     {
+      fDistance = BlePedometerData.getDistance(arrayList.get(nDataCnt).getTotalStep(), DEFAULT_USER_HEIGHT);
+      fCalorie = BlePedometerData.getCalorie(fDistance, DEFAULT_USER_WEIGHT);
+
       strTitle = new String[]{
         String.format("%d/%d", arrayList.get(nDataCnt).getMonth(), arrayList.get(nDataCnt).getDay()),
         String.valueOf(arrayList.get(nDataCnt).getTimeIndex()),
         String.valueOf(arrayList.get(nDataCnt).getTotalStep()),
-        String.valueOf(arrayList.get(nDataCnt).getRunStep())};
-
+        String.valueOf(arrayList.get(nDataCnt).getRunStep()),
+        df.format(fDistance),
+        df.format(fCalorie)};
       setTableRaw(tableLayout, strTitle);
     }
   }

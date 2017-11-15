@@ -225,12 +225,14 @@ public class SleepMonitorFragment extends Fragment {
     {
       fileWriter = new FileWriter(strFilename, true);
       bufferedWriter = new BufferedWriter(fileWriter);
-      bufferedWriter.write("Hour, Minute, Mode, G-Code, Remain day, Index");
+      bufferedWriter.write("Month, Day, Hour, Minute, Mode, G-Code, Remain day, Index");
       bufferedWriter.newLine();
 
       for (BleSleepData bleSleepData : dataArrayList)
       {
-        bufferedWriter.write(String.format("%d, %d, %s, %d, %d, %d",
+        bufferedWriter.write(String.format("%d, %d, %d, %d, %s, %d, %d, %d",
+                             bleSleepData.getMonth(),
+                             bleSleepData.getDay(),
                              bleSleepData.getHour(),
                              bleSleepData.getMinute(),
                              parseSleepMode(bleSleepData.getMode()),
@@ -299,13 +301,22 @@ public class SleepMonitorFragment extends Fragment {
     int nDataCnt;
 
     tableLayout = (TableLayout) getView().findViewById(R.id.sleep_monitor_table_layout);
-    strTitle = new String[]{"Hour", "Minute", "Mode", "G-Code", "Remain day", "Index"};
+    strTitle = new String[]{"Month",
+                            "Day",
+                            "Hour",
+                            "Minute",
+                            "Mode",
+                            "G-Code",
+                            "Remain day",
+                            "Index"};
 
     setTableRaw(tableLayout, strTitle);
 
     for (nDataCnt = 0; nDataCnt < arrayList.size(); nDataCnt++)
     {
       strTitle = new String[]{
+        String.valueOf(arrayList.get(nDataCnt).getMonth()),
+        String.valueOf(arrayList.get(nDataCnt).getDay()),
         String.valueOf(arrayList.get(nDataCnt).getHour()),
         String.valueOf(arrayList.get(nDataCnt).getMinute()),
         parseSleepMode(arrayList.get(nDataCnt).getMode()),
