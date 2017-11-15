@@ -49,7 +49,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
     void onConnect(String strName);
     void onGetPedometerDataFinish(int nDataCnt, ArrayList<BlePedometerData> arrayList);
     void onGetSleepMonitorDataFinish(ArrayList<BleSleepData> arrayList);
-    void onGetTodaySteps(int steps);
   }
 
   /**
@@ -253,7 +252,6 @@ public class DemoBle implements BleCmdService.OnDataListener,
   @Override
   public void todayStep(int i)
   {
-    mDemoBleEvent.onGetTodaySteps(i);
   }
 
   @Override
@@ -363,12 +361,21 @@ public class DemoBle implements BleCmdService.OnDataListener,
    *
    * Send command to get today steps
    *
-   * @return NULL
+   * @return today step
    */
-  public void getTodayStep()
+  public int getTodayStep()
   {
     Log.d(LOG_TAG, "Request to read today steps");
     mBleService.CmdTodayStep();
+    /// [AT-PM] : Wait data ready ; 11/15/2017
+    int step = -1;
+    while(step < 0)
+    {
+      com.vitalsigns.sdk.utility.Utility.SleepSomeTime(100);
+      step = mBleService.GetTodayStep();
+      Log.d(LOG_TAG, String.format("getTodayStep() = %d", step));
+    }
+    return (step);
   }
 
   @Override

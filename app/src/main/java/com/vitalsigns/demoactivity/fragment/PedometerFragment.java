@@ -38,7 +38,7 @@ public class PedometerFragment extends Fragment
   public interface OnPedometerFragmentListener {
     void onGetPedometerData();
     void onConnectionFirst();
-    void onGetTodayStep();
+    int onGetTodayStep();
   }
 
   public PedometerFragment() {
@@ -327,37 +327,27 @@ public class PedometerFragment extends Fragment
     tableLayout.addView(tableRow);
   }
 
-  /**
-   * @brief updateCurrentStep
-   *
-   * Update current steps real time
-   *
-   * @param steps steps to be updated
-   * @return NULL
-   */
-  public void updateCurrentStep(final int steps)
-  {
-    getActivity().runOnUiThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        View view = getView();
-        if(view != null)
-        {
-          ((TextView)view.findViewById(R.id.pedometer_current_step)).setText(String.format("%d", steps));
-        }
-      }
-    });
-  }
-
   private Runnable mUpdateTodayStepRunnable = new Runnable()
   {
     @Override
     public void run()
     {
       /// [AT-PM] : Get today steps ; 09/13/2017
-      mListener.onGetTodayStep();
+      final int step = mListener.onGetTodayStep();
+
+      /// [AT-PM} : Update result ; 11/15/2017
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          View view = getView();
+          if(view != null)
+          {
+            ((TextView)view.findViewById(R.id.pedometer_current_step)).setText(String.format("%d", step));
+          }
+        }
+      });
 
       /// [AT-PM] : Read value every 1 second ; 09/13/2017
       if(mUpdateTodayStepHandler != null)
