@@ -179,7 +179,7 @@ public class PedometerFragment extends Fragment
       getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          mProgressDialog.hide();
+          mProgressDialog.dismiss();
         }
       });
     }
