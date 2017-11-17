@@ -303,7 +303,10 @@ public class PedometerFragment extends Fragment
       fCalorie = BlePedometerData.getCalorie(fDistance, DEFAULT_USER_WEIGHT);
 
       strTitle = new String[]{
-        String.format("%d/%d", arrayList.get(nDataCnt).getMonth(), arrayList.get(nDataCnt).getDay()),
+        String.format("%d/%d/%d",
+                      arrayList.get(nDataCnt).getYear(),
+                      arrayList.get(nDataCnt).getMonth(),
+                      arrayList.get(nDataCnt).getDay()),
         String.valueOf(arrayList.get(nDataCnt).getTimeIndex()),
         String.valueOf(arrayList.get(nDataCnt).getTotalStep()),
         String.valueOf(arrayList.get(nDataCnt).getRunStep()),
