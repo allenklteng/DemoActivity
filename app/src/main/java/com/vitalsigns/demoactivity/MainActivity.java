@@ -305,6 +305,12 @@ public class MainActivity extends AppCompatActivity
       }
       return (mThread.getLooper());
     }
+
+    @Override
+    public void onResetPedometerData()
+    {
+      mDemoBle.resetPedometerData();
+    }
   };
 
   /**
