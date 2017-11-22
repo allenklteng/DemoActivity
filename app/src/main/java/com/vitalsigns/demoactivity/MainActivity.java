@@ -391,6 +391,15 @@ public class MainActivity extends AppCompatActivity
       }
       return (mThread.getLooper());
     }
+
+    @Override
+    public void onResetSleepData()
+    {
+      if(mDemoBle != null)
+      {
+        mDemoBle.resetSleepMonitorData();
+      }
+    }
   };
 
   /**

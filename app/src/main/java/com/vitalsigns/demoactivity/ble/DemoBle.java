@@ -439,4 +439,9 @@ public class DemoBle implements BleCmdService.OnDataListener,
   {
     mBleService.CmdStepReset();
   }
+
+  public void resetSleepMonitorData()
+  {
+    mBleService.CmdSleepReset();
+  }
 }

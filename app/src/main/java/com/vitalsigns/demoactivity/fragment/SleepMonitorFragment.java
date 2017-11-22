@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class SleepMonitorFragment extends Fragment {
     ArrayList<BleSleepData> onGetSleepMonitorData();
     void onConnectionFirst();
     Looper onGetLooper();
+    void onResetSleepData();
   }
 
   public SleepMonitorFragment() {
@@ -53,8 +55,11 @@ public class SleepMonitorFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_sleep_monitor, container, false);
+                           Bundle savedInstanceState)
+  {
+    View view = inflater.inflate(R.layout.fragment_sleep_monitor, container, false);
+    view.findViewById(R.id.sleep_data_reset).setOnClickListener(mOnClickResetData);
+    return (view);
   }
 
   /**
@@ -382,4 +387,17 @@ public class SleepMonitorFragment extends Fragment {
       mUpdateSleepMonitorDataHandler = null;
     }
   }
+
+  private View.OnClickListener mOnClickResetData = new View.OnClickListener()
+  {
+    @Override
+    public void onClick(View v)
+    {
+      Log.d(LOG_TAG, String.format("mOnClickResetData.onClick(%s)", v.toString()));
+      if(mListener != null)
+      {
+        mListener.onResetSleepData();
+      }
+    }
+  };
 }
