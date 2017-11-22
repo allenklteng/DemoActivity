@@ -305,6 +305,12 @@ public class MainActivity extends AppCompatActivity
       }
       return (mThread.getLooper());
     }
+
+    @Override
+    public void onResetPedometerData()
+    {
+      mDemoBle.resetPedometerData();
+    }
   };
 
   /**
@@ -384,6 +390,15 @@ public class MainActivity extends AppCompatActivity
         return (null);
       }
       return (mThread.getLooper());
+    }
+
+    @Override
+    public void onResetSleepData()
+    {
+      if(mDemoBle != null)
+      {
+        mDemoBle.resetSleepMonitorData();
+      }
     }
   };
 

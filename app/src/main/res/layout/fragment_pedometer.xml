@@ -5,11 +5,22 @@
   android:layout_height="match_parent"
   tools:context="com.vitalsigns.demoactivity.fragment.PedometerFragment">
 
+  <Button
+    android:id="@+id/pedometer_reset"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_margin="16dp"
+    android:textSize="40sp"
+    android:textStyle="bold"
+    android:textAlignment="center"
+    android:text="RESET DATA ON WATCH"/>
+
   <TextView
     android:id="@+id/pedometer_current_step"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentTop="true"
+    android:layout_below="@id/pedometer_reset"
     android:layout_margin="16dp"
     android:textSize="40sp"
     android:textStyle="bold"

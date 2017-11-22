@@ -434,4 +434,14 @@ public class DemoBle implements BleCmdService.OnDataListener,
   {
     Log.d(LOG_TAG, String.format("ackNameGet(%s)", name));
   }
+
+  public void resetPedometerData()
+  {
+    mBleService.CmdStepReset();
+  }
+
+  public void resetSleepMonitorData()
+  {
+    mBleService.CmdSleepReset();
+  }
 }

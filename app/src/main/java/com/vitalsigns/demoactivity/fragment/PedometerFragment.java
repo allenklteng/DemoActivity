@@ -47,6 +47,7 @@ public class PedometerFragment extends Fragment
     void onConnectionFirst();
     int onGetTodayStep();
     Looper onGetLooper();
+    void onResetPedometerData();
   }
 
   public PedometerFragment() {
@@ -59,8 +60,11 @@ public class PedometerFragment extends Fragment
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_pedometer, container, false);
+                           Bundle savedInstanceState)
+  {
+    View view = inflater.inflate(R.layout.fragment_pedometer, container, false);
+    view.findViewById(R.id.pedometer_reset).setOnClickListener(mOnClickResetPedometer);
+    return (view);
   }
 
   @Override
@@ -420,4 +424,16 @@ public class PedometerFragment extends Fragment
       mUpdateTodayStepHandler = null;
     }
   }
+
+  private View.OnClickListener mOnClickResetPedometer = new View.OnClickListener()
+  {
+    @Override
+    public void onClick(View v)
+    {
+      if(mListener != null)
+      {
+        mListener.onResetPedometerData();
+      }
+    }
+  };
 }
